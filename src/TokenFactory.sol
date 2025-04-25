@@ -27,6 +27,7 @@ contract TokenFactory is Ownable {
         s_tokenToAddress[symbol] = addr;
         emit TokenDeployed(symbol, addr);
     }
+    // @audit-info - Not used
 
     function getTokenAddressFromSymbol(string memory symbol) public view returns (address addr) {
         return s_tokenToAddress[symbol];
