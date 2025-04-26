@@ -20,6 +20,8 @@ contract TokenFactory is Ownable {
      * @param symbol The symbol of the new token
      * @param contractBytecode The bytecode of the new token
      */
+    // @audit-high - this approach for create not work on zksync
+    // (https://docs.zksync.io/zksync-protocol/differences/evm-instructions#create-create2)
     function deployToken(string memory symbol, bytes memory contractBytecode) public onlyOwner returns (address addr) {
         assembly {
             addr := create(0, add(contractBytecode, 0x20), mload(contractBytecode))
