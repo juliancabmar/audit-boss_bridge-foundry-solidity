@@ -15,11 +15,12 @@ contract Fuzztests is Test {
     L1BossBridge tokenBridge;
     L1Vault vault;
 
-    address deployer = makeAddr("deployer");
+    address bridgeOwner = makeAddr("deployer");
+    address signer = makeAddr("signer");
     address user = makeAddr("user");
 
     function setUp() public {
-        vm.startPrank(deployer);
+        vm.startPrank(bridgeOwner);
 
         // Deploy token and transfer the user some initial balance
         token = new L1Token();
@@ -30,7 +31,7 @@ contract Fuzztests is Test {
         vault = tokenBridge.vault();
 
         // Add a new allowed signer to the bridge
-        tokenBridge.setSigner(operator.addr, true);
+        tokenBridge.setSigner(signer, true);
 
         vm.stopPrank();
     }

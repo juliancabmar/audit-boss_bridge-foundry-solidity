@@ -6,5 +6,31 @@
 
 ----------------------------------------------------------------------------------------------
 
+Dev notes:
+
+- The owner of the bridge can pause operations in emergency situations.
+- Because deposits are permissionless, there's an strict limit of tokens that can be deposited.
+- Withdrawals must be approved by a bridge operator
+
+## Actors/Roles
+
+- Bridge Owner: A centralized bridge owner who can:
+  - pause/unpause the bridge in the event of an emergency
+  - set `Signers` (see below)
+- Signer: Users who can "send" a token from L2 -> L1. 
+- Vault: The contract owned by the bridge that holds the tokens. 
+- Users: Users mainly only call `depositTokensToL2`, when they want to send tokens from L1 -> L2. 
+
+## Known Issues
+
+- We are aware the bridge is centralized and owned by a single user, aka it is centralized. 
+- We are missing some zero address checks/input validation intentionally to save gas. 
+- We have magic numbers defined as literals that should be constants. 
+- Assume the `deployToken` will always correctly have an L1Token.sol copy, and not some [weird erc20](https://github.com/d-xo/weird-erc20)
+
 Invariants:
 
+- The bridge owner can pause/unpause the bridge anytime
+- The users are not allow to deposit far the deposit limit
+- Only the Signers can send tokens from L1 to L2
+- Nobody can withdraw without the bridge owner approval.

@@ -1,0 +1,20 @@
+{
+    "[solidity]": {
+        "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+    },
+    "editor.formatOnSave": true,
+    "application.shellEnvironmentResolutionTimeout": 30,
+    "update.mode": "manual",
+    "editor.wordWrapColumn": 220,
+    "solidity.formatter": "forge",
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "solidity": true
+    },
+    "search.quickOpen.includeSymbols": true,
+    "search.useIgnoreFiles": false,
+    "workbench.startupEditor": "none"
+}
