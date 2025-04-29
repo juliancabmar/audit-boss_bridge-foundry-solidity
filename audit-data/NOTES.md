@@ -34,3 +34,17 @@ Invariants:
 - The users are not allow to deposit far the deposit limit
 - Only the Signers can send tokens from L1 to L2
 - Nobody can withdraw without the bridge owner approval.
+
+
+
+
+
+Factory owner -(deploy)-> TokenFactory.sol
+        Factory owner -(create tokens)-> TokenFactory.sol -(deploy)-> {... L1Token.sol}
+
+Bridge Owner -(deploy)-> L1BossBridge.sol -(deploy)-> L1Vault.sol
+        Bridge Owner -(pause) -> L1BossBridge.sol
+        Bridge Owner -(unpause) -> L1BossBridge.sol
+        Bridge Owner -(set signer) -> L1BossBridge.sol -> {... signer}
+
+                User -(depositTokensToL2)-> L1BossBridge.sol
