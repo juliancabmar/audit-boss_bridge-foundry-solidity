@@ -27,9 +27,9 @@
 <body>
 
 <div class="full-page">
-    <img src="../audit-utils/report-utils/logo.jpeg" alt="Logo">
+    <img src="../../audit-utils/report-utils/logo.jpeg" alt="Logo">
     <div>
-    <h1>Thunder Loan Audit Report</h1>
+    <h1>Boss Bridge Audit Report</h1>
     <h3>Prepared by: Julián Cabrera Marceglia</h3>
     </div>
 </div>
@@ -39,7 +39,7 @@
 
 <!-- Your report starts here! -->
 
-# Thunder Loan Audit Report
+# Boss Bridge Audit Report
 
 ### Prepared by: Julián Cabrera Marceglia
 Lead Auditors: 
@@ -51,11 +51,8 @@ Assisting Auditors:
 - None
 
 # Table of contents
-<details>
 
-<summary>See table</summary>
-
-- [Thunder Loan Audit Report](#thunder-loan-audit-report)
+- [Boss Bridge Audit Report](#thunder-loan-audit-report)
 - [Table of contents](#table-of-contents)
 - [About Julian Cabrera Marceglia](#about-julian-cabrera-marceglia)
 - [Disclaimer](#disclaimer)
@@ -81,7 +78,6 @@ Assisting Auditors:
   - [Low](#low)
     - [\[L-1\] Lack of event emission during withdrawals and sending tokesn to L1](#l-1-lack-of-event-emission-during-withdrawals-and-sending-tokesn-to-l1)
     
-</details>
 </br>
 
 # About Julian Cabrera Marceglia
@@ -105,9 +101,9 @@ The Julián Cabrera Marceglia team makes all effort to find as many vulnerabilit
 
 **The findings described in this document correspond the following:**
 ```
-code base: https://github.com/juliancabmar/audit-thunder-loan
+code base: https://github.com/juliancabmar/audit-boss_bridge-foundry-solidity
 
-commit hash: c82f9a656a52afc5320ce61ea0d8cbbd76f6d2f1
+commit hash: 9e0dbcb3c415cd029c0bd02b76af3c7892283447
 ```
 
 ## Scope 
